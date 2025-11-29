@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="USP1 - The Digital Penny. America's discontinued penny reborn on-chain, fully integrated with USD1. Buy the new digital penny before it repegs to $0.01.">
+    <title>USP1 — The Digital Penny | Repeg the Penny</title>
+
+    <!-- Google Fonts: Fredoka and Baloo 2 for cute/cartoony text, Permanent Marker for badges -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Baloo+2:wght@400;500;600;700;800&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================
+           USAGE NOTES:
+           - Place penny 1.png, penny 2.png, penny 3.png,
+             penny 4.png, penny 5.png, and penny 6.png
+             in the same folder as this HTML file.
+           ============================================ */
+
+        /* CSS Variables - Bright Cartoony Color Palette */
+        :root {
+            --copper: #dc6303;
+            --copper-light: #ed8c02;
+            --copper-dark: #ff500d;
+            --gold: #ed8c02;
+            --bronze: #dc6303;
+            --orange: #ff500d;
+            --bg-white: #FFFFFF;
+            --bg-cream: #FFF9F0;
+            --bg-light: #FFF5E6;
+            --text-dark: #2C1810;
+            --text-brown: #5D3A1A;
+            --text-muted: #8B6F47;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 245, 230, 0.9);
+            --glass-border: rgba(200, 117, 51, 0.3);
+            --glow: rgba(245, 166, 35, 0.6);
+            --shadow: rgba(44, 24, 16, 0.15);
+        }
+
+        /* Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Baloo 2', 'Fredoka', cursive, sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+            cursor: default;
+            font-weight: 500;
+        }
+
+        /* Spinning Coin at Top */
+        .spinning-coin-container {
+            position: relative;
+            margin: 3rem auto;
+            width: clamp(250px, 30vw, 400px);
+            height: clamp(250px, 30vw, 400px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .spinning-coin {
+            width: 100%;
+            height: 100%;
+            animation: continuousSpin 2s linear infinite;
+            filter: drop-shadow(0 15px 50px var(--shadow))
+                    drop-shadow(0 20px 60px var(--glow));
+            transition: all 0.3s ease;
+        }
+
+        .spinning-coin:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 20px 60px var(--shadow))
+                    drop-shadow(0 25px 80px var(--glow));
+        }
+
+        .spinning-coin.flipping {
+            animation: flip 0.6s ease-in-out;
+        }
+
+        @keyframes continuousSpin {
+            from {
+                transform: rotateY(0deg);
+            }
+            to {
+                transform: rotateY(360deg);
+            }
+        }
+
+        @keyframes flip {
+            0% {
+                transform: rotateY(0deg) scale(1);
+            }
+            50% {
+                transform: rotateY(180deg) scale(1.3);
+            }
+            100% {
+                transform: rotateY(360deg) scale(1);
+            }
+        }
+
+        /* Coin Trail Effect */
+        .coin-trail {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            z-index: 998;
+            opacity: 0.7;
+        }
+
+        /* Falling Pennies Canvas */
+        #falling-pennies {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            font-size: clamp(1.1rem, 2vw, 1.25rem);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* CA Banner */
+        .ca-banner {
+            background: var(--bronze);
+            padding: 0.75rem 0;
+            text-align: center;
+            border-bottom: 4px solid #000;
+            border-top: 4px solid #000;
+            position: relative;
+            overflow: hidden;
+            z-index: 1001;
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.6), 0 8px 15px var(--shadow);
+        }
+
+        .ca-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .ca-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .ca-label {
+            font-weight: 800;
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            letter-spacing: 1px;
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+        }
+
+        .ca-address {
+            font-family: 'Courier New', monospace;
+            background: rgba(255,255,255,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #000;
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        .ca-address:hover {
+            background: rgba(255,255,255,0.5);
+            transform: translateY(-2px);
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        .copy-btn {
+            background: var(--gold);
+            color: #fff;
+            border: 3px solid #000;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            box-shadow: 3px 3px 0 #000;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            letter-spacing: 1px;
+            -webkit-text-stroke: 1.5px #000;
+            text-stroke: 1.5px #000;
+            paint-order: stroke fill;
+        }
+
+        .copy-btn:hover {
+            background: var(--orange);
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--glass-border);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            background: var(--bronze);
+            text-decoration: none;
+            letter-spacing: 1px;
+            line-height: 1.2;
+            padding: 0.6rem 1.5rem;
+            border: 4px solid #000;
+            border-radius: 12px;
+            box-shadow: 4px 4px 0 #000, 8px 8px 0 rgba(220, 99, 3, 0.5);
+            transform: rotate(-2deg);
+            transition: all 0.3s ease;
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+        }
+
+        .logo:hover {
+            transform: rotate(-2deg) translateY(-3px);
+            box-shadow: 6px 6px 0 #000, 10px 10px 0 rgba(220, 99, 3, 0.5);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .follow-x-btn {
+            background: var(--gold);
+            color: #fff;
+            padding: 0.6rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0 #000, 8px 8px 0 rgba(237, 140, 2, 0.5);
+            transform: rotate(1deg);
+            letter-spacing: 1px;
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+        }
+
+        .follow-x-btn:hover {
+            transform: rotate(1deg) translateY(-3px);
+            box-shadow: 6px 6px 0 #000, 10px 10px 0 rgba(237, 140, 2, 0.5);
+        }
+
+        .launch-app-btn {
+            background: #cccccc;
+            color: #888888;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            cursor: not-allowed;
+            opacity: 0.6;
+            pointer-events: none;
+            border: 2px solid #999;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+            transition: all 0.3s ease;
+            position: relative;
+            font-size: 1rem;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            letter-spacing: 1px;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            background: var(--copper);
+            border: 3px solid #000;
+            box-shadow: 3px 3px 0 #000;
+            -webkit-text-stroke: 1.5px #000;
+            text-stroke: 1.5px #000;
+            paint-order: stroke fill;
+        }
+
+        nav a:hover {
+            transform: translateY(-3px);
+            box-shadow: 4px 4px 0 #000;
+            background: var(--orange);
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: var(--bronze);
+            border: 4px solid #000;
+            color: #fff;
+            font-size: 1.3rem;
+            cursor: pointer;
+            font-weight: 800;
+            padding: 0.4rem 0.8rem;
+            border-radius: 10px;
+            box-shadow: 4px 4px 0 #000;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            padding: 4rem 0 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .hero-headline {
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-size: clamp(4rem, 10vw, 8.5rem);
+            font-weight: 800;
+            color: var(--orange);
+            margin-bottom: 2rem;
+            line-height: 1;
+            transform: rotate(-3deg);
+            letter-spacing: 3px;
+            -webkit-text-stroke: 6px #000;
+            text-stroke: 6px #000;
+            paint-order: stroke fill;
+            filter: drop-shadow(6px 6px 0px #000)
+                    drop-shadow(12px 12px 0px var(--copper))
+                    drop-shadow(18px 18px 0px var(--gold))
+                    drop-shadow(24px 24px 30px rgba(0, 0, 0, 0.5));
+            animation: headlinePulse 3s ease-in-out infinite;
+            text-transform: uppercase;
+        }
+
+        @keyframes headlinePulse {
+            0%, 100% {
+                transform: rotate(-3deg) scale(1);
+            }
+            50% {
+                transform: rotate(-3deg) scale(1.02);
+            }
+        }
+
+        .hero-subheadline {
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 3rem;
+            line-height: 1.1;
+            transform: rotate(1deg);
+            letter-spacing: 1px;
+            -webkit-text-stroke: 4px #000;
+            text-stroke: 4px #000;
+            paint-order: stroke fill;
+            filter: drop-shadow(3px 3px 0px var(--orange))
+                    drop-shadow(6px 6px 0px var(--gold));
+        }
+
+        .hero-text h1 {
+            display: none;
+        }
+
+        .hero-text .intro-text {
+            font-size: 1.125rem;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            color: var(--text-brown);
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-text .intro-text strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-size: 1.4rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--orange), var(--gold));
+            color: #fff;
+            box-shadow: 5px 5px 0px #000, 10px 10px 0px rgba(220, 99, 3, 0.5);
+            position: relative;
+            border: 4px solid #000;
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 7px 7px 0px #000, 14px 14px 0px rgba(220, 99, 3, 0.5);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--copper);
+            border: 4px solid #000;
+            box-shadow: 5px 5px 0px #000, 10px 10px 0px rgba(237, 140, 2, 0.5);
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+        }
+
+        .btn-secondary:hover {
+            background: var(--copper);
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 7px 7px 0px #000, 14px 14px 0px rgba(237, 140, 2, 0.5);
+        }
+
+        /* Hero Images - Hidden */
+        .hero-images {
+            display: none;
+        }
+
+        /* Section Styles */
+        section {
+            padding: 5rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 3rem;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-weight: 800;
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            letter-spacing: 2px;
+            -webkit-text-stroke: 3px #000;
+            text-stroke: 3px #000;
+            paint-order: stroke fill;
+            filter: drop-shadow(3px 3px 0px var(--copper))
+                    drop-shadow(6px 6px 0px var(--gold));
+        }
+
+        /* What is USP1 Section */
+        .what-is {
+            background: var(--bg-light);
+        }
+
+        .what-is-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .bullet-points {
+            display: grid;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .bullet-card {
+            background: var(--white);
+            border: 3px solid var(--copper);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 5px 5px 0px var(--gold), 10px 10px 20px var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .bullet-card:hover {
+            transform: translateY(-8px) rotate(-1deg);
+            box-shadow: 7px 7px 0px var(--gold), 15px 15px 30px var(--shadow);
+        }
+
+        .bullet-card h3 {
+            color: #fff;
+            margin-bottom: 1rem;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-weight: 700;
+            font-size: 1.8rem;
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+            filter: drop-shadow(2px 2px 0px var(--copper));
+        }
+
+        .bullet-card p {
+            color: var(--text-brown);
+        }
+
+        /* Comic Book Collage Section */
+        .comic-collage {
+            background: var(--bg-cream);
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .comic-collage::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200,117,51,0.05) 2px, rgba(200,117,51,0.05) 4px);
+            pointer-events: none;
+        }
+
+        .comic-page {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: repeat(10, 120px);
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .comic-panel {
+            position: relative;
+            border: 6px solid #000;
+            background: #fff;
+            overflow: hidden;
+            box-shadow:
+                8px 8px 0px rgba(0, 0, 0, 0.9),
+                0 15px 40px rgba(0, 0, 0, 0.7);
+            transform: scale(0.8) rotate(var(--rotate, -3deg));
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .comic-panel.revealed {
+            transform: scale(1) rotate(0deg);
+            opacity: 1;
+        }
+
+        .comic-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .comic-panel:hover {
+            transform: scale(1.02) rotate(0deg) translateY(-5px);
+            box-shadow:
+                10px 10px 0px rgba(0, 0, 0, 0.9),
+                0 20px 50px rgba(245, 166, 35, 0.4);
+        }
+
+        .comic-panel:hover::before {
+            opacity: 1;
+        }
+
+        .comic-panel img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            filter: contrast(1.1) saturate(1.2);
+        }
+
+        /* Comic book halftone pattern overlay */
+        .comic-panel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px);
+            background-size: 6px 6px;
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 2;
+            mix-blend-mode: multiply;
+        }
+
+        /* Speech Bubbles */
+        .speech-bubble {
+            position: absolute;
+            top: 10%;
+            right: 5%;
+            background: #fff;
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 20px;
+            border: 4px solid #000;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-weight: 800;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            z-index: 4;
+            box-shadow: 4px 4px 0 #000;
+            animation: bubble-pop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            right: 30%;
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid #000;
+        }
+
+        .speech-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: -13px;
+            right: calc(30% + 3px);
+            width: 0;
+            height: 0;
+            border-left: 12px solid transparent;
+            border-right: 12px solid transparent;
+            border-top: 17px solid #fff;
+            z-index: 1;
+        }
+
+        .bubble-left {
+            right: auto;
+            left: 5%;
+        }
+
+        .bubble-left::after {
+            right: auto;
+            left: 30%;
+        }
+
+        .bubble-left::before {
+            right: auto;
+            left: calc(30% + 3px);
+        }
+
+        @keyframes bubble-pop {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Comic Captions */
+        .comic-caption {
+            position: absolute;
+            top: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--gold);
+            color: #fff;
+            padding: 0.5rem 2rem;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-weight: 800;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0 #000;
+            z-index: 4;
+            white-space: nowrap;
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+        }
+
+        /* Sound Effects */
+        .sound-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-5deg);
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-weight: 800;
+            font-size: 3rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            z-index: 4;
+            animation: sound-pulse 1s ease-in-out infinite;
+            pointer-events: none;
+            -webkit-text-stroke: 4px #000;
+            text-stroke: 4px #000;
+            paint-order: stroke fill;
+            filter: drop-shadow(4px 4px 0px var(--orange));
+        }
+
+        @keyframes sound-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) rotate(-5deg) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) rotate(-5deg) scale(1.05);
+            }
+        }
+
+        /* Panel-specific sizes and positions */
+        .panel-1 {
+            grid-column: 1 / 5;
+            grid-row: 1 / 4;
+            --rotate: 2deg;
+        }
+
+        .panel-2 {
+            grid-column: 5 / 10;
+            grid-row: 1 / 5;
+            --rotate: -2deg;
+        }
+
+        .panel-3 {
+            grid-column: 10 / 13;
+            grid-row: 1 / 3;
+            --rotate: 1deg;
+        }
+
+        .panel-4 {
+            grid-column: 1 / 7;
+            grid-row: 4 / 7;
+            --rotate: -3deg;
+        }
+
+        .panel-5 {
+            grid-column: 10 / 13;
+            grid-row: 3 / 6;
+            --rotate: 2deg;
+        }
+
+        .panel-6 {
+            grid-column: 7 / 10;
+            grid-row: 5 / 8;
+            --rotate: -1deg;
+        }
+
+        .panel-7 {
+            grid-column: 1 / 4;
+            grid-row: 7 / 9;
+            --rotate: 3deg;
+        }
+
+        .panel-8 {
+            grid-column: 4 / 8;
+            grid-row: 8 / 11;
+            --rotate: -2deg;
+        }
+
+        .panel-9 {
+            grid-column: 10 / 13;
+            grid-row: 6 / 9;
+            --rotate: 1deg;
+        }
+
+        .panel-10 {
+            grid-column: 8 / 13;
+            grid-row: 9 / 11;
+            --rotate: -1deg;
+        }
+
+        /* Live Chart Section */
+        .chart {
+            background: var(--orange);
+            padding: 3rem 0 !important;
+        }
+
+        .chart-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--white);
+            border: 8px solid var(--orange);
+            border-radius: 30px;
+            padding: 2.5rem;
+            box-shadow: 8px 8px 0px #000, 15px 15px 30px var(--shadow);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 65%; /* Adjusted for GeckoTerminal */
+            height: 0;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #000;
+        }
+
+        .chart-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 20px;
+        }
+
+        .chart-caption {
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--text-brown);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        /* How to Buy Section */
+        .how-to-buy {
+            background: var(--bg-light);
+            background-image: url('banner.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .how-to-buy::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 245, 230, 0.65);
+            z-index: 0;
+        }
+
+        .how-to-buy .container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .step-card {
+            background: var(--white);
+            border: 3px solid var(--orange);
+            border-radius: 20px;
+            padding: 3rem 2.5rem 2.5rem 2.5rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            box-shadow: 5px 5px 0px var(--copper), 10px 10px 20px var(--shadow);
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px) rotate(1deg);
+            box-shadow: 7px 7px 0px var(--copper), 15px 15px 30px var(--shadow);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--orange), var(--gold));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #fff;
+            border: 4px solid #000;
+            box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.6), 6px 6px 15px var(--shadow);
+        }
+
+        .step-card h3 {
+            margin-top: 1rem;
+            color: #fff;
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-weight: 700;
+            font-size: 1.6rem;
+            -webkit-text-stroke: 2px #000;
+            text-stroke: 2px #000;
+            paint-order: stroke fill;
+            filter: drop-shadow(2px 2px 0px var(--orange));
+        }
+
+        .step-card p {
+            color: var(--text-brown);
+        }
+
+        .cta-center {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .disclaimer {
+            max-width: 800px;
+            margin: 3rem auto 0;
+            padding: 1.5rem;
+            background: var(--white);
+            border-radius: 15px;
+            border: 3px solid var(--copper);
+            box-shadow: 4px 4px 0px var(--gold), 8px 8px 15px var(--shadow);
+        }
+
+        .disclaimer p {
+            font-size: 0.95rem;
+            color: var(--text-brown);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-white);
+            padding: 3rem 0 1.5rem;
+            border-top: 3px solid var(--copper);
+            box-shadow: 0 -5px 20px var(--shadow);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--white);
+            border: 3px solid var(--copper);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--copper);
+            text-decoration: none;
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+            box-shadow: 3px 3px 0px var(--gold), 6px 6px 10px var(--shadow);
+        }
+
+        .social-icon:hover {
+            background: var(--copper);
+            color: var(--white);
+            transform: translateY(-5px) rotate(10deg);
+            box-shadow: 5px 5px 0px var(--gold), 10px 10px 15px var(--shadow);
+        }
+
+        .copyright {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            font-family: 'Baloo 2', 'Fredoka', cursive;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            body {
+                cursor: auto;
+            }
+
+            #custom-cursor, #cursor-trail {
+                display: none;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+            }
+
+            .ca-content {
+                font-size: 0.8rem;
+            }
+
+            .ca-address {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+
+            .hero-images {
+                order: -1;
+                height: 400px;
+            }
+
+            .collage-image {
+                width: 180px;
+                height: 180px;
+            }
+
+            .collage-image:nth-child(2) {
+                width: 160px;
+                height: 160px;
+            }
+
+            .collage-image:nth-child(3) {
+                width: 140px;
+                height: 140px;
+            }
+
+            .cta-buttons {
+                justify-content: center;
+            }
+
+            .follow-x-btn {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .logo {
+                font-size: 1.1rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            nav {
+                position: fixed;
+                top: 120px;
+                right: -100%;
+                width: 70%;
+                height: calc(100vh - 120px);
+                background: var(--white);
+                border-left: 3px solid var(--copper);
+                box-shadow: -5px 0 20px var(--shadow);
+                transition: right 0.3s ease;
+                padding: 2rem;
+            }
+
+            nav.active {
+                right: 0;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .header-actions {
+                flex-direction: row-reverse;
+            }
+        }
+
+        @media (max-width: 968px) {
+            .comic-page {
+                grid-template-columns: repeat(6, 1fr);
+                grid-template-rows: repeat(12, 150px);
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .panel-1 {
+                grid-column: 1 / 4;
+                grid-row: 1 / 3;
+            }
+
+            .panel-2 {
+                grid-column: 4 / 7;
+                grid-row: 1 / 4;
+            }
+
+            .panel-3 {
+                grid-column: 1 / 3;
+                grid-row: 3 / 5;
+            }
+
+            .panel-4 {
+                grid-column: 3 / 7;
+                grid-row: 4 / 6;
+            }
+
+            .panel-5 {
+                grid-column: 1 / 4;
+                grid-row: 5 / 7;
+            }
+
+            .panel-6 {
+                grid-column: 4 / 7;
+                grid-row: 6 / 8;
+            }
+
+            .panel-7 {
+                grid-column: 1 / 3;
+                grid-row: 7 / 9;
+            }
+
+            .panel-8 {
+                grid-column: 3 / 7;
+                grid-row: 8 / 10;
+            }
+
+            .panel-9 {
+                grid-column: 1 / 4;
+                grid-row: 9 / 11;
+            }
+
+            .panel-10 {
+                grid-column: 4 / 7;
+                grid-row: 10 / 13;
+            }
+
+            .sound-effect {
+                font-size: 2rem;
+            }
+
+            .speech-bubble {
+                font-size: 1rem;
+                padding: 0.6rem 1.2rem;
+            }
+
+            .comic-caption {
+                font-size: 0.9rem;
+                padding: 0.4rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-images {
+                height: 300px;
+            }
+
+            .collage-image {
+                width: 120px;
+                height: 120px;
+            }
+
+            .collage-image:nth-child(2) {
+                width: 110px;
+                height: 110px;
+            }
+
+            .collage-image:nth-child(3) {
+                width: 100px;
+                height: 100px;
+            }
+
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .logo {
+                font-size: 0.9rem;
+            }
+
+            .comic-collage {
+                padding: 3rem 0;
+            }
+
+            .comic-page {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                gap: 1.5rem;
+            }
+
+            .comic-panel {
+                grid-column: 1 !important;
+                grid-row: auto !important;
+                min-height: 280px;
+            }
+
+            .sound-effect {
+                font-size: 1.5rem;
+            }
+
+            .speech-bubble {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+
+        /* Coming Soon Tape Hover Effect */
+        .launch-app-wrapper:hover .coming-soon-tape {
+            opacity: 0.3 !important;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3)) !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2) !important;
+            border: 4px solid rgba(0, 0, 0, 0.3) !important;
+            transform: translate(-50%, -50%) rotate(-8deg) scale(0.95) !important;
+        }
+
+        .launch-app-wrapper:hover .launch-app-btn-inner {
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Falling Pennies Canvas -->
+    <canvas id="falling-pennies"></canvas>
+
+    <!-- ============================================
+         CONTRACT ADDRESS BANNER
+         ============================================ -->
+    <div class="ca-banner">
+        <div class="ca-content">
+            <span class="ca-label">📍 CONTRACT ADDRESS:</span>
+            <span class="ca-address" id="caAddress">7zaerpu4De3Aob5TJwqXQoit72S2woTEfsbGWP95bonk</span>
+            <button class="copy-btn" id="copyBtn">Copy CA</button>
+        </div>
+    </div>
+
+    <!-- ============================================
+         HEADER / NAVIGATION
+         ============================================ -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="index.html#" class="logo">United States Penny 1</a>
+                <div class="header-actions">
+                    <a href="comingsoon.html" class="launch-app-btn">
+                        🚀 Launch App
+                    </a>
+                    <a href="https://x.com/usp1onbonk?s=21" target="_blank" class="follow-x-btn" id="followBtn">
+                        <span>𝕏</span> Follow Us
+                    </a>
+                    <button class="mobile-menu-toggle" aria-label="Toggle menu">☰</button>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="index.html#home">Home</a></li>
+                        <li><a href="index.html#about">About</a></li>
+                        <li><a href="index.html#chart">Chart</a></li>
+                        <li><a href="index.html#mint">Mint</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- ============================================
+             HERO SECTION
+             Uses: penny 1.png, penny 2.png, penny 3.png
+             ============================================ -->
+        <!-- ============================================
+             SPINNING COIN SECTION
+             ============================================ -->
+        <section style="background: var(--bg-white); padding: 2rem 0;">
+            <div class="container">
+                <!-- Spinning Coin -->
+                <div class="spinning-coin-container" id="spinningCoinContainer">
+                    <img src="usp_1-removebg-preview.png" alt="USP1 Coin" class="spinning-coin" id="spinningCoin">
+                </div>
+            </div>
+        </section>
+
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-headline">America <img src="flag.gif" alt="American Flag" style="display: inline-block; height: 1.2em; vertical-align: middle; margin: 0 0.2em; transform: translateY(-0.05em);"> has gotten rid of The penny!!!</h1>
+                    <h2 class="hero-subheadline">Introducing $USP1</h2>
+
+                    <div class="hero-text">
+                        <div class="cta-buttons">
+                            <a href="index.html#mint" class="btn btn-primary">Buy USP1</a>
+                            <div style="position: relative; display: inline-block;" class="launch-app-wrapper">
+                                <a href="index.html#" class="btn btn-secondary launch-app-btn-inner" style="font-size: 1.5rem; padding: 1.3rem 3.5rem; pointer-events: none; opacity: 0.5; transition: all 0.3s ease;">Launch App</a>
+                                <div class="coming-soon-tape" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-8deg); background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 165, 0, 0.9)); color: #000; font-weight: 900; padding: 0.8rem 4rem; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 3px; box-shadow: 0 8px 20px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.5); border: 4px solid #000; border-radius: 8px; font-family: 'Baloo 2', 'Fredoka', cursive; -webkit-text-stroke: 2px #000; text-stroke: 2px #000; paint-order: stroke fill; pointer-events: auto; z-index: 5; white-space: nowrap; transition: all 0.3s ease; cursor: not-allowed;">COMING SOON!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================
+             USE CASES SECTION
+             ============================================ -->
+        <section style="background: var(--bg-light); padding: 3rem 0;">
+            <div class="container">
+                <h2 class="section-title" style="margin-bottom: 0; transform: rotate(-1deg);">Does the penny have any use cases?</h2>
+                <p style="text-align: center; font-size: 1.5rem; margin-top: 1rem; color: var(--text-brown); font-weight: 600;">we are about to find out .....</p>
+            </div>
+        </section>
+
+        <!-- ============================================
+             LIVE CHART SECTION
+             GeckoTerminal iframe embed
+             ============================================ -->
+        <section id="chart" class="chart">
+            <div class="container">
+                <h2 class="section-title">Live Chart</h2>
+                <div class="chart-container">
+                    <div class="chart-wrapper">
+                        <iframe
+                            src="https://www.geckoterminal.com/solana/pools/7zaerpu4De3Aob5TJwqXQoit72S2woTEfsbGWP95bonk?embed=1&info=0&swaps=1"
+                            title="USP1 Live Market Chart"
+                            loading="lazy"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================
+             WHAT IS USP1 SECTION
+             ============================================ -->
+        <section id="about" class="what-is">
+            <div class="container">
+                <h2 class="section-title" style="margin-bottom: 1rem;">
+                    <span style="font-size: 0.8em;">Tell your family and friends the digital</span>
+                    <span style="color: var(--orange); font-size: 1.3em; display: block; margin: 0.5rem 0; text-shadow: 4px 4px 0px #000, 8px 8px 0px var(--copper); -webkit-text-stroke: 5px #000;">REVOLUTION</span>
+                    <span style="font-size: 0.8em;">is here!!!</span>
+                </h2>
+                <div class="what-is-content">
+                    <div class="lore-text-container">
+                        <p class="lore-text lore-1" style="transform: rotate(-3deg); margin-left: 5%; margin-bottom: 2rem;">
+                            🪙 <strong>The World's First Digital Penny</strong> — America discontinued the physical penny, but we're bringing it back—on-chain.
+                        </p>
+                        <p class="lore-text lore-2" style="transform: rotate(2deg); margin-left: 10%; margin-bottom: 2rem;">
+                            <strong style="color: var(--orange);">USP1</strong> is a modern digital asset fully integrated with USD1, preserving the penny's legacy while giving it new life in the crypto era.
+                        </p>
+                        <p class="lore-text lore-3" style="transform: rotate(-2deg); margin-left: 3%; margin-bottom: 2rem;">
+                            📈 <strong>Massive Mainstream Appeal</strong> — Buy the new penny before it's eventually repegged to $0.01.
+                        </p>
+                        <p class="lore-text lore-4" style="transform: rotate(3deg); margin-left: 8%;">
+                            A simple, powerful narrative that anyone can understand. <strong style="color: var(--orange);">USP1</strong> is the rebirth of the penny—immutable, digital, and on-chain forever.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================
+             HOW TO BUY / CALL TO ACTION SECTION
+             ============================================ -->
+        <section id="mint" class="how-to-buy">
+            <div class="container">
+                <h2 class="section-title">How to Buy USP1</h2>
+
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Get a Wallet</h3>
+                        <p>Download a Solana-compatible wallet like Phantom or Solflare to store your USP1.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>Add SOL</h3>
+                        <p>Purchase SOL from an exchange and transfer it to your wallet to cover transaction fees.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Swap for USP1</h3>
+                        <p>Connect your wallet to a DEX and swap your SOL for USP1 tokens. Welcome to the penny revolution!</p>
+                    </div>
+                </div>
+
+                <div class="cta-center">
+                    <a href="index.html#chart" class="btn btn-primary" style="font-size: 1.25rem; padding: 1.25rem 3rem;">Buy USP1 Now</a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ============================================
+             COMIC BOOK COLLAGE SECTION
+             Uses: ALL penny images 1-10
+             ============================================ -->
+        <section class="comic-collage">
+            <div class="container">
+                <div class="comic-page">
+                    <!-- Row 1 -->
+                    <div class="comic-panel panel-1" data-panel="1">
+                        <img src="penny&#32;1.png" alt="USP1 Penny" loading="lazy">
+                        <div class="comic-caption">THE PENNY...</div>
+                    </div>
+                    <div class="comic-panel panel-2" data-panel="2">
+                        <img src="penny&#32;8.png" alt="USP1 Penny" loading="lazy">
+                        <div class="speech-bubble">IT'S TIME!</div>
+                    </div>
+                    <div class="comic-panel panel-3" data-panel="3">
+                        <img src="penny&#32;2.png" alt="USP1 Penny" loading="lazy">
+                        <div class="comic-caption">REBORN</div>
+                    </div>
+
+                    <!-- Row 2 -->
+                    <div class="comic-panel panel-4" data-panel="4">
+                        <img src="penny&#32;7.png" alt="USP1 Penny" loading="lazy">
+                        <div class="sound-effect">TO THE MOON!</div>
+                    </div>
+                    <div class="comic-panel panel-5" data-panel="5">
+                        <img src="penny&#32;4.png" alt="USP1 Penny" loading="lazy">
+                        <div class="comic-caption">ON-CHAIN</div>
+                    </div>
+
+                    <!-- Row 3 -->
+                    <div class="comic-panel panel-6" data-panel="6">
+                        <img src="penny&#32;9.png" alt="USP1 Penny" loading="lazy">
+                        <div class="speech-bubble bubble-left">PEACEFUL.</div>
+                    </div>
+                    <div class="comic-panel panel-7" data-panel="7">
+                        <img src="penny&#32;5.png" alt="USP1 Penny" loading="lazy">
+                        <div class="comic-caption">DIGITAL</div>
+                    </div>
+                    <div class="comic-panel panel-8" data-panel="8">
+                        <img src="penny&#32;10.png" alt="USP1 Penny" loading="lazy">
+                        <div class="speech-bubble">HELLO!</div>
+                    </div>
+
+                    <!-- Row 4 -->
+                    <div class="comic-panel panel-9" data-panel="9">
+                        <img src="penny&#32;3.png" alt="USP1 Penny" loading="lazy">
+                        <div class="comic-caption">FOREVER</div>
+                    </div>
+                    <div class="comic-panel panel-10" data-panel="10">
+                        <img src="penny&#32;6.png" alt="USP1 Penny" loading="lazy">
+                        <div class="sound-effect">REPEG!</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">United States Penny 1</div>
+                <div class="social-icons">
+                    <a href="https://x.com/usp1onbonk?s=21" target="_blank" class="social-icon" aria-label="Twitter">𝕏</a>
+                    <a href="index.html#" class="social-icon" aria-label="Discord">💬</a>
+                    <a href="index.html#" class="social-icon" aria-label="Telegram">✈️</a>
+                    <a href="index.html#" class="social-icon" aria-label="GitHub">⚙️</a>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 USP1. All rights reserved. Repeg the penny. 🪙</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ============================================
+         VANILLA JAVASCRIPT
+         Mobile menu, carousel, smooth scroll
+         ============================================ -->
+    <script src="script.js"></script>
+    <script>
+        // Spinning Coin Flip Functionality
+        const spinningCoin = document.getElementById('spinningCoin');
+        const spinningCoinContainer = document.getElementById('spinningCoinContainer');
+        let isFlipping = false;
+
+        spinningCoinContainer.addEventListener('click', () => {
+            if (isFlipping) return;
+
+            isFlipping = true;
+
+            // Temporarily remove the continuous spin animation
+            spinningCoin.style.animation = 'flip 0.6s ease-in-out';
+
+            // Create trail effect
+            createCoinTrail();
+
+            playSound('coin');
+
+            setTimeout(() => {
+                // Restore continuous spin animation
+                spinningCoin.style.animation = 'continuousSpin 2s linear infinite';
+                isFlipping = false;
+            }, 600);
+        });
+
+        // Create coin trail effect
+        function createCoinTrail() {
+            const rect = spinningCoin.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 12; i++) {
+                setTimeout(() => {
+                    const trail = document.createElement('img');
+                    trail.src = 'usp_1-removebg-preview.png';
+                    trail.className = 'coin-trail';
+                    trail.style.left = centerX + 'px';
+                    trail.style.top = centerY + 'px';
+
+                    const angle = (Math.PI * 2 * i) / 12;
+                    const distance = 100;
+                    const endX = centerX + Math.cos(angle) * distance;
+                    const endY = centerY + Math.sin(angle) * distance;
+
+                    document.body.appendChild(trail);
+
+                    setTimeout(() => {
+                        trail.style.transition = 'all 0.6s ease-out';
+                        trail.style.left = endX + 'px';
+                        trail.style.top = endY + 'px';
+                        trail.style.opacity = '0';
+                        trail.style.transform = 'scale(0.3) rotate(' + (360 * (i / 12)) + 'deg)';
+                    }, 10);
+
+                    setTimeout(() => {
+                        trail.remove();
+                    }, 650);
+                }, i * 30);
+            }
+        }
+
+        // Copy CA functionality
+        const copyBtn = document.getElementById('copyBtn');
+        const caAddress = document.getElementById('caAddress');
+
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText('7zaerpu4De3Aob5TJwqXQoit72S2woTEfsbGWP95bonk');
+                copyBtn.textContent = '✓ Copied!';
+                playSound('copy');
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy CA';
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy:', err);
+            }
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.querySelector('.mobile-menu-toggle');
+        const nav = document.querySelector('nav');
+        const navLinks = document.querySelectorAll('nav a');
+
+        menuToggle.addEventListener('click', () => {
+            nav.classList.toggle('active');
+            menuToggle.textContent = nav.classList.contains('active') ? '✕' : '☰';
+            playSound('click');
+        });
+
+        // Close mobile menu when clicking a link
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('active');
+                menuToggle.textContent = '☰';
+            });
+        });
+
+        // Comic Panel Scroll Reveal
+        const comicObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    playSound('whoosh');
+                }
+            });
+        }, {
+            threshold: 0.3,
+            rootMargin: '0px'
+        });
+
+        document.querySelectorAll('.comic-panel').forEach(panel => {
+            comicObserver.observe(panel);
+        });
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Button effects with sound
+        document.querySelectorAll('.btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                this.style.transform = 'scale(0.95)';
+                playSound('click');
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+
+        // Follow button sound
+        document.getElementById('followBtn').addEventListener('click', () => {
+            playSound('success');
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.bullet-card, .step-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
+
+<!-- ============================================
+     REMINDER: Place penny 1.png, penny 2.png,
+     penny 3.png, penny 4.png, penny 5.png,
+     and penny 6.png in the same folder as this file.
+     ============================================ -->
